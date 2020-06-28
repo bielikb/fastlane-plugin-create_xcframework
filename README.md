@@ -61,3 +61,7 @@ to learn more about the plugin.
 * XCFRAMEWORK_DSYM_OUTPUT_PATH
 * XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH
 
+
+## Contribution
+
+- If you **want to contribute**, read the [Contributing Guide](https://github.com/bielikb/fastlane-plugin-create_xcframework/blob/master/CONTRIBUTING.md)
