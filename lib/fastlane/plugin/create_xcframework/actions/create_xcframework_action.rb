@@ -40,12 +40,12 @@ module Fastlane
       end
 
       def self.provide_shared_values
-          Actions.lane_context[SharedValues::XCFRAMEWORK_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_path)
-          ENV[SharedValues::XCFRAMEWORK_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_path)
-          Actions.lane_context[SharedValues::XCFRAMEWORK_DSYM_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_dSYMs_path)
-          ENV[SharedValues::XCFRAMEWORK_DSYM_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_dSYMs_path)
-          Actions.lane_context[SharedValues::XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_BCSymbolMaps_path)
-          ENV[SharedValues::XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_BCSymbolMaps_path)
+        Actions.lane_context[SharedValues::XCFRAMEWORK_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_path)
+        ENV[SharedValues::XCFRAMEWORK_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_path)
+        Actions.lane_context[SharedValues::XCFRAMEWORK_DSYM_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_dSYMs_path)
+        ENV[SharedValues::XCFRAMEWORK_DSYM_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_dSYMs_path)
+        Actions.lane_context[SharedValues::XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH] = File.expand_path(@xchelper.xcframework_BCSymbolMaps_path)
+        ENV[SharedValues::XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_BCSymbolMaps_path)
       end
 
       def self.clean
@@ -56,7 +56,7 @@ module Fastlane
         xcframework = @xchelper.xcframework_path
         begin
           FileUtils.rm_rf(xcframework) if File.exist?(xcframework)
-          framework_links = params[:destinations].each_with_index.map do |_, index| 
+          framework_links = params[:destinations].each_with_index.map do |_, index|
             "-framework #{@xchelper.xcarchive_framework_path(index)} #{debug_symbols(index: index, params: params)}"
           end
 
@@ -79,8 +79,9 @@ module Fastlane
         # Include BCSymbols in xcframework
         if params[:include_BCSymbolMaps] != false && params[:include_bitcode] != false
           bc_symbols_dir = @xchelper.xcarchive_BCSymbolMaps_path(index)
-          if Dir.exist?(bc_symbols_dir) 
-            debug_symbols << Dir.children(bc_symbols_dir).map { |path| "-debug-symbols #{File.expand_path("#{bc_symbols_dir}/#{path}")}" }.join(' ') 
+          if Dir.exist?(bc_symbols_dir)
+            arguments = Dir.children(bc_symbols_dir).map { |path| "-debug-symbols #{File.expand_path("#{bc_symbols_dir}/#{path}")}" }
+            debug_symbols << arguments.join(' ')
           end
         end
 
@@ -196,7 +197,8 @@ module Fastlane
       end
 
       def self.details
-        "Create xcframework plugin generates xcframework for specified destinations. The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled."
+        'Create xcframework plugin generates xcframework for specified destinations. ' \
+          'The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled.'
       end
 
       def self.available_options

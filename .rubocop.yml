@@ -40,18 +40,6 @@ Style/BracesAroundHashParameters:
 Lint/UselessAssignment:
   Exclude:
   - "**/spec/**/*"
-Require/MissingRequireStatement:
-  Exclude:
-  - "**/spec/**/*.rb"
-  - "**/spec_helper.rb"
-  - spaceship/lib/spaceship/babosa_fix.rb
-  - "**/Fastfile"
-  - "**/*.gemspec"
-  - rakelib/**/*
-  - "**/*.rake"
-  - "**/Rakefile"
-  - fastlane/**/*
-  - supply/**/*
 Layout/IndentHash:
   Enabled: false
 Layout/AlignHash:
@@ -125,7 +113,7 @@ Layout/SpaceAroundOperators:
   Exclude:
   - "**/spec/actions_specs/xcodebuild_spec.rb"
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.4
   Include:
   - "*/lib/assets/*Template"
   - "*/lib/assets/*TemplateAndroid"
@@ -156,16 +144,6 @@ Style/IfInsideElse:
   Enabled: false
 Style/CollectionMethods:
   Enabled: false
-CrossPlatform/ForkUsage:
-  Exclude:
-  - "**/plugins/template/**/*"
-Lint/IsStringUsage:
-  Include:
-  - cert/**/*
-  - gym/**/*
-  - match/**/*
-  - screengrab/**/*
-  - supply/**/*
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   IgnoredMethods:

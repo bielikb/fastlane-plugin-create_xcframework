@@ -6,7 +6,7 @@ module Fastlane
       end
 
       def product_name
-         @params[:product_name] ||= @params[:scheme]
+        @params[:product_name] ||= @params[:scheme]
       end
 
       def xcframework
