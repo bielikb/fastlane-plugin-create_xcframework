@@ -33,23 +33,23 @@ module Fastlane
       end
 
       def xcarchive_dSYMs_path(framework_index)
-        "#{xcarchive_path(framework_index)}/dSYMS"
+        File.expand_path("#{xcarchive_path(framework_index)}/dSYMS")
       end
 
       def xcframework_dSYMs_path
-        "#{output_directory}/#{product_name}.dSYMs"
+        File.expand_path("#{output_directory}/#{product_name}.dSYMs")
       end
 
       def xcarchive_BCSymbolMaps_path(framework_index)
-        "#{xcarchive_path(framework_index)}/BCSymbolMaps"
+        File.expand_path("#{xcarchive_path(framework_index)}/BCSymbolMaps")
       end
 
       def xcframework_BCSymbolMaps_path
-        "#{output_directory}/#{product_name}.BCSymbolMaps"
+        File.expand_path("#{output_directory}/#{product_name}.BCSymbolMaps")
       end
 
       def xcframework_path
-        "#{output_directory}/#{xcframework}"
+        File.expand_path("#{output_directory}/#{xcframework}")
       end
 
       def output_directory

@@ -26,13 +26,12 @@ create_xcframework(
     workspace: 'path/to/your.xcworkspace',
     scheme: 'framework scheme',
     product_name: 'Sample', # optional if scheme doesnt match the name of your framework
-    include_bitcode: true,
-    destinations: ['iOS', 'maccatalyst'], # 
+    destinations: ['iOS', 'maccatalyst'],
     xcframework_output_directory: 'path/to/your/output dir'
 )
 ```
 
-Run 
+Run
 ```bash
 $ fastlane actions create_xcframework
 ```
@@ -47,7 +46,6 @@ to learn more about the plugin.
 * watchOS
 * carPlayOS
 * macOS
-
 
 ## Output
 
