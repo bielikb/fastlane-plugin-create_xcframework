@@ -21,7 +21,7 @@ module Fastlane
 
           params[:destinations].each_with_index do |destination, framework_index|
             params[:destination] = destination
-            params[:archive_path] = @xchelper.xcarchive_path(framework_index)
+            params[:archive_path] = @xchelper.xcarchive_path_for_destination(framework_index)
             XcarchiveAction.run(params)
           end
 
@@ -31,7 +31,7 @@ module Fastlane
 
           copy_BCSymbolMaps(params)
 
-          clean
+          clean(params)
 
           provide_shared_values
         else
@@ -48,8 +48,8 @@ module Fastlane
         ENV[SharedValues::XCFRAMEWORK_BCSYMBOLMAPS_OUTPUT_PATH.to_s] = File.expand_path(@xchelper.xcframework_BCSymbolMaps_path)
       end
 
-      def self.clean
-        @xchelper.xcarchive_frameworks_path.each { |framework| FileUtils.rm_rf(framework.split('/').first) }
+      def self.clean(params)
+        FileUtils.rm_rf(@xchelper.xcarchive_path) if params[:remove_xcarchives]
       end
 
       def self.create_xcframework(params)
@@ -67,7 +67,7 @@ module Fastlane
       end
 
       def self.debug_symbols(index:, params:)
-        return "" unless Helper.xcode_at_least?('12.0.0')
+        return "" unless Helper.xcode_at_least?('12.0.0') && params[:include_debug_symbols] == true
 
         debug_symbols = []
 
@@ -77,7 +77,7 @@ module Fastlane
         end
 
         # Include BCSymbols in xcframework
-        if params[:include_BCSymbolMaps] != false && params[:include_bitcode] != false
+        if params[:include_BCSymbolMaps] != false && params[:enable_bitcode] != false
           bc_symbols_dir = @xchelper.xcarchive_BCSymbolMaps_path(index)
           if Dir.exist?(bc_symbols_dir)
             arguments = Dir.children(bc_symbols_dir).map { |path| "-debug-symbols #{File.expand_path("#{bc_symbols_dir}/#{path}")}" }
@@ -89,6 +89,8 @@ module Fastlane
       end
 
       def self.copy_dSYMs(params)
+        return if params[:include_dSYMs] == false
+
         dSYMs_output_dir = @xchelper.xcframework_dSYMs_path
         FileUtils.mkdir_p(dSYMs_output_dir)
 
@@ -104,7 +106,7 @@ module Fastlane
       end
 
       def self.copy_BCSymbolMaps(params)
-        return if params[:include_bitcode] == false
+        return if params[:enable_bitcode] == false || params[:include_BCSymbolMaps] == false
 
         symbols_output_dir = @xchelper.xcframework_BCSymbolMaps_path
         FileUtils.mkdir_p(symbols_output_dir)
@@ -134,7 +136,7 @@ module Fastlane
         end
         xcargs = ['SKIP_INSTALL=NO', 'BUILD_LIBRARY_FOR_DISTRIBUTION=YES']
 
-        if params[:include_bitcode] != false
+        if params[:enable_bitcode] != false
           params[:xcargs].gsub!(/ENABLE_BITCODE(=|\s+)(YES|NO)/, '') if params[:xcargs]
           xcargs << ['OTHER_CFLAGS="-fembed-bitcode"', 'BITCODE_GENERATION_MODE="bitcode"', 'ENABLE_BITCODE=YES']
         end
@@ -198,7 +200,7 @@ module Fastlane
 
       def self.details
         'Create xcframework plugin generates xcframework for specified destinations. ' \
-          'The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled.'
+         'The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled.'
       end
 
       def self.available_options
@@ -209,7 +211,7 @@ module Fastlane
             optional: false
           ),
           FastlaneCore::ConfigItem.new(
-            key: :include_bitcode,
+            key: :enable_bitcode,
             description: "Should the project be built with bitcode enabled?",
             optional: true,
             is_string: false,
@@ -240,9 +242,23 @@ module Fastlane
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
+            key: :include_debug_symbols,
+            description: 'This feature was added in Xcode 12.0.' \
+                          'If this is set to false, the dSYMs and BCSymbolMaps wont be added to XCFramework itself',
+            optional: true,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :product_name,
             description: "The name of your module. Optional if equals to :scheme. Equivalent to CFBundleName",
             optional: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :remove_xcarchives,
+            description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \ 
+                          'Set this to false to preserve the xcarchives',
+            optional: true,
+            default_value: true
           )
         ]
       end
