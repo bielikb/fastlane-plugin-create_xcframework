@@ -17,12 +17,16 @@ module Fastlane
         "#{product_name}.framework"
       end
 
-      def xcarchive_path(framework_index)
-        "#{framework_index}_#{product_name}.xcarchive"
+      def xcarchive_path
+        "#{output_directory}/archives"
+      end
+
+      def xcarchive_path_for_destination(framework_index)
+        "#{xcarchive_path}/#{framework_index}_#{product_name}.xcarchive"
       end
 
       def xcarchive_framework_path(framework_index)
-        framework_path = "#{xcarchive_path(framework_index)}/Products/Library/Frameworks/#{framework}"
+        framework_path = "#{xcarchive_path_for_destination(framework_index)}/Products/Library/Frameworks/#{framework}"
         return framework_path if File.exist?(framework_path)
 
         FastlaneCore::UI.user_error!("▸ PRODUCT_NAME was misdefined: `#{product_name}`. Please, provide :product_name option")
@@ -33,7 +37,7 @@ module Fastlane
       end
 
       def xcarchive_dSYMs_path(framework_index)
-        File.expand_path("#{xcarchive_path(framework_index)}/dSYMS")
+        File.expand_path("#{xcarchive_path_for_destination(framework_index)}/dSYMS")
       end
 
       def xcframework_dSYMs_path
@@ -41,7 +45,7 @@ module Fastlane
       end
 
       def xcarchive_BCSymbolMaps_path(framework_index)
-        File.expand_path("#{xcarchive_path(framework_index)}/BCSymbolMaps")
+        File.expand_path("#{xcarchive_path_for_destination(framework_index)}/BCSymbolMaps")
       end
 
       def xcframework_BCSymbolMaps_path
