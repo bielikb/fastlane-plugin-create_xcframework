@@ -200,7 +200,7 @@ module Fastlane
 
       def self.details
         'Create xcframework plugin generates xcframework for specified destinations. ' \
-         'The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled.'
+          'The output of this action consists of the xcframework itself, which contains dSYM and BCSymbolMaps, if bitcode is enabled.'
       end
 
       def self.available_options
@@ -255,7 +255,7 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :remove_xcarchives,
-            description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \ 
+            description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \
                           'Set this to false to preserve the xcarchives',
             optional: true,
             default_value: true
