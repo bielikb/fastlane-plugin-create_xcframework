@@ -144,7 +144,7 @@ module Fastlane
           xcargs << ['OTHER_CFLAGS="-fembed-bitcode"', 'BITCODE_GENERATION_MODE="bitcode"', 'ENABLE_BITCODE=YES']
         end
 
-        params[:xcargs].to_s + xcargs.join(' ')
+        params[:xcargs].to_s + ' ' + xcargs.join(' ')
       end
 
       def self.update_destinations(params)
