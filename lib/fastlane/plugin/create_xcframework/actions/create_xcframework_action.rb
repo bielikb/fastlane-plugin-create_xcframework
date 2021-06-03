@@ -15,7 +15,9 @@ module Fastlane
         if Helper.xcode_at_least?('11.0.0')
           verify_delicate_params(params)
           params[:destinations] = update_destinations(params)
-          params[:xcargs] = update_xcargs(params)
+          if params[:override_xcargs]
+            params[:xcargs] = update_xcargs(params)
+          end
 
           @xchelper = Helper::CreateXcframeworkHelper.new(params)
 
@@ -257,6 +259,13 @@ module Fastlane
             key: :remove_xcarchives,
             description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \
                           'Set this to false to preserve the xcarchives',
+            optional: true,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :override_xcargs,
+            description: 'This option will update xcargs to override SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION options' \
+                          'Set this to false to preserve the xcargs',
             optional: true,
             default_value: true
           )
