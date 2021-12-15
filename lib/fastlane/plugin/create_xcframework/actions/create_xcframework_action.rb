@@ -128,20 +128,23 @@ module Fastlane
       end
 
       def self.update_xcargs(params)
-        FastlaneCore::UI.important('Overwriting SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION options')
-        if params[:xcargs]
-          params[:xcargs].gsub!(/SKIP_INSTALL(=|\s+)(YES|NO)/, '')
-          params[:xcargs].gsub!(/BUILD_LIBRARY_FOR_DISTRIBUTION(=|\s+)(YES|NO)/, '')
-          params[:xcargs] += ' '
+        xcargs = []
+        if params[:override_xcargs]
+          FastlaneCore::UI.important('Overwriting SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION options')
+          if params[:xcargs]
+            params[:xcargs].gsub!(/SKIP_INSTALL(=|\s+)(YES|NO)/, '')
+            params[:xcargs].gsub!(/BUILD_LIBRARY_FOR_DISTRIBUTION(=|\s+)(YES|NO)/, '')
+            params[:xcargs] += ' '
+          end
+          xcargs.concat(['SKIP_INSTALL=NO', 'BUILD_LIBRARY_FOR_DISTRIBUTION=YES'])
         end
-        xcargs = ['SKIP_INSTALL=NO', 'BUILD_LIBRARY_FOR_DISTRIBUTION=YES']
 
         if params[:enable_bitcode] != false
           params[:xcargs].gsub!(/ENABLE_BITCODE(=|\s+)(YES|NO)/, '') if params[:xcargs]
           xcargs << ['OTHER_CFLAGS="-fembed-bitcode"', 'BITCODE_GENERATION_MODE="bitcode"', 'ENABLE_BITCODE=YES']
         end
 
-        params[:xcargs].to_s + xcargs.join(' ')
+        params[:xcargs].to_s + ' ' + xcargs.join(' ')
       end
 
       def self.update_destinations(params)
@@ -257,6 +260,14 @@ module Fastlane
             key: :remove_xcarchives,
             description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \
                           'Set this to false to preserve the xcarchives',
+            optional: true,
+            default_value: true
+          ),
+          FastlaneCore::ConfigItem.new(
+            key: :override_xcargs,
+            description: 'This option will override xcargs SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION.' \
+                          'If set to true, SKIP_INSTALL will be set to NO and BUILD_LIBRARY_FOR_DISTRIBUTION will be set to YES' \
+                          'Set this to false to preserve the passed xcargs',
             optional: true,
             default_value: true
           )
