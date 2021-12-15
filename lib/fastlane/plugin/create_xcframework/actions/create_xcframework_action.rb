@@ -56,11 +56,16 @@ module Fastlane
         xcframework = @xchelper.xcframework_path
         begin
           FileUtils.rm_rf(xcframework) if File.exist?(xcframework)
-          framework_links = params[:destinations].each_with_index.map do |_, index|
-            "-framework #{@xchelper.xcarchive_framework_path(index)} #{debug_symbols(index: index, params: params)}"
+          
+          arguments = ['-create-xcframework']
+          arguments << '-allow-internal-distribution' if params[:allow_internal_distribution]
+          params[:destinations].each_with_index do |_, index|
+            arguments << "-framework #{@xchelper.xcarchive_framework_path(index)}"
+            arguments << debug_symbols(index: index, params: params)
           end
-
-          Actions.sh("set -o pipefail && xcodebuild -create-xcframework #{framework_links.join(' ')} -output #{xcframework}")
+          arguments << "-output #{xcframework}"
+          
+          Actions.sh("set -o pipefail && xcodebuild #{arguments.reject(&:empty?).join(' ')}")
         rescue => err
           UI.user_error!(err)
         end
@@ -264,6 +269,13 @@ module Fastlane
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
+            key: :allow_internal_distribution,
+            description: 'This option will create an xcframework with the allow-internal-distribution flag.' \
+                         'Allows the usage of @testable when importing the created xcframework in tests',
+            optional: true,
+            default_value: false
+         ),
+         FastlaneCore::ConfigItem.new(
             key: :override_xcargs,
             description: 'This option will override xcargs SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION.' \
                           'If set to true, SKIP_INSTALL will be set to NO and BUILD_LIBRARY_FOR_DISTRIBUTION will be set to YES' \
