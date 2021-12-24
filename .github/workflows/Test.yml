@@ -1,0 +1,27 @@
+name: Test
+
+on: [push]
+
+jobs:
+  chat:
+    name: Checks
+    runs-on: macos-11
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - uses: actions/cache@v2.1.6
+        id: bundler-cache
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Bundler
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+          bundle check || bundle install --jobs 4 --retry 3
+      - name: Tests
+        run: bundle exec rake

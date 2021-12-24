@@ -29,7 +29,7 @@ module Fastlane
         framework_path = "#{xcarchive_path_for_destination(framework_index)}/Products/Library/Frameworks/#{framework}"
         return framework_path if File.exist?(framework_path)
 
-        FastlaneCore::UI.user_error!("▸ PRODUCT_NAME was misdefined: `#{product_name}`. Please, provide :product_name option")
+        UI.user_error!("▸ PRODUCT_NAME was misdefined: `#{product_name}`. Please, provide :product_name option")
       end
 
       def xcarchive_frameworks_path
@@ -57,7 +57,7 @@ module Fastlane
       end
 
       def output_directory
-        @params[:xcframework_output_directory] ? @params[:xcframework_output_directory] : ''
+        @params[:xcframework_output_directory] || ''
       end
 
       def library_identifier(framework_index)

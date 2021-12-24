@@ -35,7 +35,7 @@ module Fastlane
 
           provide_shared_values
         else
-          FastlaneCore::UI.important('xcframework can be produced only using Xcode 11 and above')
+          UI.important('xcframework can be produced only using Xcode 11 and above')
         end
       end
 
@@ -56,7 +56,7 @@ module Fastlane
         xcframework = @xchelper.xcframework_path
         begin
           FileUtils.rm_rf(xcframework) if File.exist?(xcframework)
-          
+
           arguments = ['-create-xcframework']
           arguments << '-allow-internal-distribution' if params[:allow_internal_distribution]
           params[:destinations].each_with_index do |_, index|
@@ -64,15 +64,15 @@ module Fastlane
             arguments << debug_symbols(index: index, params: params)
           end
           arguments << "-output #{xcframework}"
-          
+
           Actions.sh("set -o pipefail && xcodebuild #{arguments.reject(&:empty?).join(' ')}")
-        rescue => err
-          UI.user_error!(err)
+        rescue StandardError => e
+          UI.user_error!(e)
         end
       end
 
       def self.debug_symbols(index:, params:)
-        return "" unless Helper.xcode_at_least?('12.0.0') && params[:include_debug_symbols] == true
+        return '' unless Helper.xcode_at_least?('12.0.0') && params[:include_debug_symbols] == true
 
         debug_symbols = []
 
@@ -105,7 +105,7 @@ module Fastlane
           dSYM = "#{@xchelper.framework}.#{identifier}.dSYM"
           dSYM_destination = "#{dSYMs_output_dir}/#{dSYM}"
 
-          FastlaneCore::UI.important("▸ Copying #{dSYM} to #{dSYMs_output_dir}")
+          UI.important("▸ Copying #{dSYM} to #{dSYMs_output_dir}")
           FileUtils.cp_r(dSYM_source, dSYM_destination)
         end
       end
@@ -121,25 +121,24 @@ module Fastlane
           next unless Dir.exist?(symbols_xcarchive_dir)
 
           FileUtils.cp_r("#{symbols_xcarchive_dir}/.", symbols_output_dir)
-          FastlaneCore::UI.important("▸ Copying #{Dir.children(symbols_xcarchive_dir)} to #{symbols_output_dir}")
+          UI.important("▸ Copying #{Dir.children(symbols_xcarchive_dir)} to #{symbols_output_dir}")
         end
       end
 
       def self.verify_delicate_params(params)
-        UI.user_error!("Error: :scheme is required option") if params[:scheme].nil?
+        UI.user_error!('Error: :scheme is required option') if params[:scheme].nil?
         if !params[:destinations].nil? && !params[:destinations].kind_of?(Array)
-          UI.user_error!("Error: :destinations option should be presented as Array")
+          UI.user_error!('Error: :destinations option should be presented as Array')
         end
       end
 
       def self.update_xcargs(params)
         xcargs = []
         if params[:override_xcargs]
-          FastlaneCore::UI.important('Overwriting SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION options')
+          UI.important('Overwriting SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION options')
           if params[:xcargs]
             params[:xcargs].gsub!(/SKIP_INSTALL(=|\s+)(YES|NO)/, '')
             params[:xcargs].gsub!(/BUILD_LIBRARY_FOR_DISTRIBUTION(=|\s+)(YES|NO)/, '')
-            params[:xcargs] += ' '
           end
           xcargs.concat(['SKIP_INSTALL=NO', 'BUILD_LIBRARY_FOR_DISTRIBUTION=YES'])
         end
@@ -149,7 +148,7 @@ module Fastlane
           xcargs << ['OTHER_CFLAGS="-fembed-bitcode"', 'BITCODE_GENERATION_MODE="bitcode"', 'ENABLE_BITCODE=YES']
         end
 
-        params[:xcargs].to_s + ' ' + xcargs.join(' ')
+        "#{params[:xcargs].to_s.strip} #{xcargs.join(' ')}"
       end
 
       def self.update_destinations(params)
@@ -180,7 +179,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "Fastlane plugin that creates xcframework for given list of destinations."
+        'Fastlane plugin that creates xcframework for given list of destinations.'
       end
 
       def self.example_code
@@ -203,7 +202,7 @@ module Fastlane
       end
 
       def self.authors
-        ["Boris Bielik", "Alexey Alter-Pesotskiy"]
+        ['Boris Bielik', 'Alexey Alter-Pesotskiy']
       end
 
       def self.details
@@ -220,32 +219,32 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :enable_bitcode,
-            description: "Should the project be built with bitcode enabled?",
+            description: 'Should the project be built with bitcode enabled?',
             optional: true,
             is_string: false,
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :destinations,
-            description: "Use custom destinations for building the xcframework",
+            description: 'Use custom destinations for building the xcframework',
             optional: true,
             is_string: false,
             default_value: ['iOS']
           ),
           FastlaneCore::ConfigItem.new(
             key: :xcframework_output_directory,
-            description: "The directory in which the xcframework should be stored in",
+            description: 'The directory in which the xcframework should be stored in',
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :include_dSYMs,
-            description: "Includes dSYM files in the xcframework",
+            description: 'Includes dSYM files in the xcframework',
             optional: true,
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :include_BCSymbolMaps,
-            description: "Includes BCSymbolMap files in the xcframework",
+            description: 'Includes BCSymbolMap files in the xcframework',
             optional: true,
             default_value: true
           ),
@@ -258,13 +257,13 @@ module Fastlane
           ),
           FastlaneCore::ConfigItem.new(
             key: :product_name,
-            description: "The name of your module. Optional if equals to :scheme. Equivalent to CFBundleName",
+            description: 'The name of your module. Optional if equals to :scheme. Equivalent to CFBundleName',
             optional: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :remove_xcarchives,
             description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \
-                          'Set this to false to preserve the xcarchives',
+                         'Set this to false to preserve the xcarchives',
             optional: true,
             default_value: true
           ),
@@ -274,8 +273,8 @@ module Fastlane
                          'Allows the usage of @testable when importing the created xcframework in tests',
             optional: true,
             default_value: false
-         ),
-         FastlaneCore::ConfigItem.new(
+          ),
+          FastlaneCore::ConfigItem.new(
             key: :override_xcargs,
             description: 'This option will override xcargs SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION.' \
                           'If set to true, SKIP_INSTALL will be set to NO and BUILD_LIBRARY_FOR_DISTRIBUTION will be set to YES' \

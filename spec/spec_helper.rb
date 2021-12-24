@@ -1,9 +1,16 @@
-$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'simplecov'
 
 # SimpleCov.minimum_coverage 95
 SimpleCov.start
+
+# Allow message expectations on nil
+RSpec.configure do |config|
+  config.mock_with(:rspec) do |mocks|
+    mocks.allow_message_expectations_on_nil = true
+  end
+end
 
 # This module is only used to check the environment is currently a testing env
 module SpecHelper
