@@ -72,7 +72,8 @@ module Fastlane
       end
 
       def self.debug_symbols(index:, params:)
-        return '' unless Helper.xcode_at_least?('12.0.0') && params[:include_debug_symbols] == true
+        return '' unless Helper.xcode_at_least?('12.0.0') 
+        return '' if params[:include_debug_symbols] == false
 
         debug_symbols = []
 

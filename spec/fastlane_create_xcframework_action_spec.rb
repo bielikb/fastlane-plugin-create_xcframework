@@ -217,6 +217,20 @@ describe Fastlane do
         expect(result).to eq(expected_result)
       end
 
+      it 'verifies debug_symbols method when :include_debug_symbols option was not provided' do
+        test_data = 'testme'
+        allow(nil).to receive(:xcarchive_BCSymbolMaps_path).and_return(test_data)
+        allow(nil).to receive(:xcarchive_dSYMs_path).and_return(test_data)
+        allow(nil).to receive(:framework).and_return(test_data)
+        allow(File).to receive(:expand_path).and_return(test_data)
+        allow(Dir).to receive(:exist?).and_return(true)
+        allow(Dir).to receive(:children).and_return([test_data])
+        allow(Fastlane::Helper).to receive(:xcode_at_least?).and_return(true)
+        result = described_class.debug_symbols(index: 0, params: { })
+        expected_result = "-debug-symbols #{test_data}/#{test_data}.dSYM -debug-symbols #{test_data}"
+        expect(result).to eq(expected_result)
+      end
+
       it 'verifies debug_symbols method when :include_dSYMs option is equals to false' do
         test_data = 'testme'
         allow(nil).to receive(:xcarchive_BCSymbolMaps_path).and_return(test_data)
