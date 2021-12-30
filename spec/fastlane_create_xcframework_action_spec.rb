@@ -190,7 +190,6 @@ describe Fastlane do
 
       it 'verifies debug_symbols method when xcode version is less than 12' do
         allow(Fastlane::Helper).to receive(:xcode_at_least?).and_return(false)
-        # params = { include_debug_symbols: true }
         result = described_class.debug_symbols(index: 0, params: {})
         expect(result).to eq('')
       end
@@ -226,7 +225,7 @@ describe Fastlane do
         allow(Dir).to receive(:exist?).and_return(true)
         allow(Dir).to receive(:children).and_return([test_data])
         allow(Fastlane::Helper).to receive(:xcode_at_least?).and_return(true)
-        result = described_class.debug_symbols(index: 0, params: { })
+        result = described_class.debug_symbols(index: 0, params: {})
         expected_result = "-debug-symbols #{test_data}/#{test_data}.dSYM -debug-symbols #{test_data}"
         expect(result).to eq(expected_result)
       end
