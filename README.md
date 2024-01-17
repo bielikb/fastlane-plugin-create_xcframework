@@ -46,6 +46,7 @@ to learn more about the plugin.
 * watchOS
 * carPlayOS
 * macOS
+* visionOS
 
 ## Output
 
