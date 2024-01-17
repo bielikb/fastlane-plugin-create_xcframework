@@ -170,7 +170,8 @@ module Fastlane
           'watchOS' => ['generic/platform=watchOS', 'generic/platform=watchOS Simulator'],
           'carPlayOS' => ['generic/platform=carPlayOS', 'generic/platform=carPlayOS Simulator'],
           'macOS' => ['generic/platform=macOS'],
-          'maccatalyst' => ['generic/platform=macOS,variant=Mac Catalyst']
+          'maccatalyst' => ['generic/platform=macOS,variant=Mac Catalyst'],
+          'visionOS' => ['generic/platform=visionOS', 'generic/platform=visionOS Simulator']
         }
       end
 
