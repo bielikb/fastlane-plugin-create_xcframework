@@ -32,6 +32,22 @@ module Fastlane
         UI.user_error!("▸ PRODUCT_NAME was misdefined: `#{product_name}`. Please, provide :product_name option")
       end
 
+      def get_xcarchive_framework_path(framework_index, framework_name)
+        UI.message("▸ get_xcarchive_framework_path: framework_name: `#{framework_name}`")
+        framework_path = "#{xcarchive_path_for_destination(framework_index)}/Products/Library/Frameworks/#{framework_name}.framework"
+        UI.message("▸ get_xcarchive_framework_path: framework_path: `#{framework_path}`")
+        return framework_path if File.exist?(framework_path)
+
+        UI.user_error!("▸ get_xcarchive_framework_path: framework_name was misdefined: `#{framework_name}`. Please, provide :framework_name option")
+      end
+
+      def xcarchive_frameworks_dir(framework_index)
+        frameworks_dir = "#{xcarchive_path_for_destination(framework_index)}/Products/Library/Frameworks"
+        return frameworks_dir if File.exist?(frameworks_dir)
+      
+        UI.user_error!("▸ Frameworks directory does not exist for the given index: `#{framework_index}`.")
+      end
+
       def xcarchive_frameworks_path
         @params[:destinations].each_with_index.map { |_, i| xcarchive_framework_path(i) }
       end
@@ -44,6 +60,10 @@ module Fastlane
         File.expand_path("#{output_directory}/#{product_name}.dSYMs")
       end
 
+      def framework_dSYMs_path(framework_name)
+        File.expand_path("#{output_directory}/#{framework_name}.dSYMs")
+      end
+
       def xcarchive_BCSymbolMaps_path(framework_index)
         File.expand_path("#{xcarchive_path_for_destination(framework_index)}/BCSymbolMaps")
       end
@@ -52,8 +72,16 @@ module Fastlane
         File.expand_path("#{output_directory}/#{product_name}.BCSymbolMaps")
       end
 
+      def framework_BCSymbolMaps_path(framework_name)
+        File.expand_path("#{output_directory}/#{framework_name}.BCSymbolMaps")
+      end
+
       def xcframework_path
         File.expand_path("#{output_directory}/#{xcframework}")
+      end
+
+      def get_xcframework_path(framework_name)
+        File.expand_path("#{output_directory}/#{framework_name}.xcframework")
       end
 
       def output_directory
