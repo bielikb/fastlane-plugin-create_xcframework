@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.4'
+  spec.required_ruby_version = '>= 2.6'
   spec.add_development_dependency('bundler')
   spec.add_development_dependency('fasterer', '0.9.0')
   spec.add_development_dependency('fastlane', '>= 2.182.0')

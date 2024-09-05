@@ -7,7 +7,7 @@ describe Fastlane do
 
       it 'verifies available_destinations method' do
         expected_destinations = [
-          'iOS', 'iPadOS', 'macOS', 'tvOS', 'watchOS', 'carPlayOS', 'maccatalyst'
+          'iOS', 'iPadOS', 'macOS', 'tvOS', 'watchOS', 'carPlayOS', 'maccatalyst', 'visionOS'
         ]
         actual_destinations = described_class.available_destinations.keys
         expect(actual_destinations.sort).to eq(expected_destinations.sort)
@@ -133,7 +133,7 @@ describe Fastlane do
       end
 
       it 'verifies copy_dSYMs method when :include_dSYMs option is equals to false' do
-        params = { include_dSYMs: false }
+        params = { include_debug_symbols: false }
         described_class.copy_dSYMs(params)
         expect(FileUtils).not_to receive(:mkdir_p)
       end
@@ -146,7 +146,7 @@ describe Fastlane do
         allow(FileUtils).to receive(:mkdir_p)
         allow(FileUtils).to receive(:cp_r)
 
-        params = { include_dSYMs: false }
+        params = { include_debug_symbols: true, destinations: ['iOS'] }
         described_class.copy_dSYMs(params)
         expect(FileUtils).not_to receive(:mkdir_p)
       end

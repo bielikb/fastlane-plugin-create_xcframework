@@ -20,9 +20,10 @@ module Fastlane
           @xchelper = Helper::CreateXcframeworkHelper.new(params)
 
           params[:destinations].each_with_index do |destination, framework_index|
-            params[:destination] = destination
-            params[:archive_path] = @xchelper.xcarchive_path_for_destination(framework_index)
-            XcarchiveAction.run(params)
+            options = params.values
+            options[:destination] = destination
+            options[:archive_path] = @xchelper.xcarchive_path_for_destination(framework_index)
+            XcarchiveAction.run(options)
           end
 
           create_xcframework(params)
@@ -94,7 +95,7 @@ module Fastlane
       end
 
       def self.copy_dSYMs(params)
-        return if params[:include_dSYMs] == false
+        return if params[:include_debug_symbols] == false
 
         dSYMs_output_dir = @xchelper.xcframework_dSYMs_path
         FileUtils.mkdir_p(dSYMs_output_dir)
@@ -111,7 +112,7 @@ module Fastlane
       end
 
       def self.copy_BCSymbolMaps(params)
-        return if params[:enable_bitcode] == false || params[:include_BCSymbolMaps] == false
+        return if params[:include_debug_symbols] == false || params[:enable_bitcode] == false || params[:include_BCSymbolMaps] == false
 
         symbols_output_dir = @xchelper.xcframework_BCSymbolMaps_path
         FileUtils.mkdir_p(symbols_output_dir)
@@ -212,7 +213,17 @@ module Fastlane
       end
 
       def self.available_options
-        XcarchiveAction.available_options + [
+        XcarchiveAction.available_options.select{ |item| item[0] != 'scheme' }.map { |elem|
+          FastlaneCore::ConfigItem.new(
+            key: elem[0].to_sym, 
+            description: elem[1].delete_suffix('.'),
+            optional: true) 
+        } + [
+          FastlaneCore::ConfigItem.new(
+            key: :project,
+            description: "The Xcode project to work with",
+            optional: true
+          ),  
           FastlaneCore::ConfigItem.new(
             key: :scheme,
             description: "The project's scheme. Make sure it's marked as Shared",
@@ -221,15 +232,13 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :enable_bitcode,
             description: 'Should the project be built with bitcode enabled?',
-            optional: true,
-            is_string: false,
-            default_value: true
+            type: Boolean,
+            default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :destinations,
             description: 'Use custom destinations for building the xcframework',
-            optional: true,
-            is_string: false,
+            type: Array,
             default_value: ['iOS']
           ),
           FastlaneCore::ConfigItem.new(
@@ -240,20 +249,20 @@ module Fastlane
           FastlaneCore::ConfigItem.new(
             key: :include_dSYMs,
             description: 'Includes dSYM files in the xcframework',
-            optional: true,
+            type: Boolean,
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
             key: :include_BCSymbolMaps,
             description: 'Includes BCSymbolMap files in the xcframework',
-            optional: true,
-            default_value: true
+            type: Boolean,
+            default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :include_debug_symbols,
             description: 'This feature was added in Xcode 12.0.' \
                           'If this is set to false, the dSYMs and BCSymbolMaps wont be added to XCFramework itself',
-            optional: true,
+            type: Boolean,
             default_value: true
           ),
           FastlaneCore::ConfigItem.new(
@@ -265,22 +274,22 @@ module Fastlane
             key: :remove_xcarchives,
             description: 'This option will auto-remove the xcarchive files once the plugin finishes.' \
                          'Set this to false to preserve the xcarchives',
-            optional: true,
-            default_value: true
+            type: Boolean,
+            default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :allow_internal_distribution,
             description: 'This option will create an xcframework with the allow-internal-distribution flag.' \
                          'Allows the usage of @testable when importing the created xcframework in tests',
-            optional: true,
+            type: Boolean,
             default_value: false
           ),
           FastlaneCore::ConfigItem.new(
             key: :override_xcargs,
             description: 'This option will override xcargs SKIP_INSTALL and BUILD_LIBRARY_FOR_DISTRIBUTION.' \
-                          'If set to true, SKIP_INSTALL will be set to NO and BUILD_LIBRARY_FOR_DISTRIBUTION will be set to YES' \
+                          'If set to true, SKIP_INSTALL will be set to NO and BUILD_LIBRARY_FOR_DISTRIBUTION will be set to YES.' \
                           'Set this to false to preserve the passed xcargs',
-            optional: true,
+            type: Boolean,
             default_value: true
           )
         ]
